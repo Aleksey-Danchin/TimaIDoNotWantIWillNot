@@ -1,32 +1,25 @@
 import Application from './Application'
 import Scene from './Scene'
 import Tween from './Tween'
+import Button from './Button'
 
 import * as Pixi from 'pixi.js'
 import { Howl, Howler } from 'howler'
 
-class SoundButton extends Pixi.Sprite {
-	constructor (imageSrc, audioMP3, audioOGG) {
-		super(Pixi.Sprite.from(imageSrc).texture)
+class SoundButton extends Button {
+	constructor (texture, audioMP3, audioOGG) {
+		super(texture)
 
 		this.sound = new Howl({
 			src: [audioMP3, audioOGG]
 		})
 
-		this.interactive = true
-		this.buttonMode = true
 		this.byTint = 0xffffff
-
-		this.on('pointerupuoutside', (...args) => this.pointerUpuOutsideHandler(...args))
-		this.on('pointermove', (...args) => this.pointerMoveHandler(...args))
-		this.on('pointerdown', (...args) => this.pointerDownHandler(...args))
-		this.on('pointerup', (...args) => this.pointerUpHandler(...args))
-		this.on('mouseover', (...args) => this.mouseOverHandler(...args))
-		this.on('mouseout', (...args) => this.mouseOutHandler(...args))
 	}
 
-	pointerDownHandler (event) {
+	pointerDown (event) {
 		this.sound.play()
+
 		Tween.create({
 			targets: [this],
 			duration: 1000,
@@ -38,15 +31,11 @@ class SoundButton extends Pixi.Sprite {
 		})
 	}
 
-	pointerUpHandler (event) {}
-	pointerUpuOutsideHandler (event) {}
-	pointerMoveHandler (event) {}
-
-	mouseOverHandler (event) {
+	mouseOver (event) {
 		this.tint = this.byTint
 	}
 
-	mouseOutHandler (event) {
+	mouseOut (event) {
 		this.tint = 0xffffff
 	}
 }
@@ -64,13 +53,15 @@ class MainScene extends Scene {
 		this.buttons = []
 	}
 
-	load (loader) {}
+	load (loader) {
+		loader.add('face1', 'assets/images/face1.jpg')
+		loader.add('face2', 'assets/images/face2.jpg')
+		loader.add('face3', 'assets/images/face3.jpg')
+	}
 
 	async create (container, loader, renderer) {
-		await delay(1500)
-
 		const button1 = new SoundButton(
-			'assets/images/face1.jpg',
+			loader.resources.face1.texture,
 			'assets/mp3/ne_hochy.mp3',
 			'assets/mp3/ne_hochy.ogg'
 		)
@@ -84,7 +75,7 @@ class MainScene extends Scene {
 		container.addChild(button1)
 
 		const button2 = new SoundButton(
-			'assets/images/face2.jpg',
+			loader.resources.face2.texture,
 			'assets/mp3/ny_davai.mp3',
 			'assets/mp3/ny_davai.ogg'
 		)
@@ -98,7 +89,7 @@ class MainScene extends Scene {
 		container.addChild(button2)
 
 		const button3 = new SoundButton(
-			'assets/images/face3.jpg',
+			loader.resources.face3.texture,
 			'assets/mp3/ne_bydy.mp3',
 			'assets/mp3/ne_bydy.ogg'
 		)
@@ -112,6 +103,7 @@ class MainScene extends Scene {
 		container.addChild(button3)
 
 		button1.sound.play()
+		console.log(button1.x,  button1.width)
 		await Tween.create({
 			targets: [button1],
 			duration: 1000,
@@ -121,6 +113,7 @@ class MainScene extends Scene {
 				alpha: 1
 			}
 		})
+		console.log(button1.x)
 
 		button3.sound.play()
 		await Tween.create({
@@ -148,7 +141,3 @@ class MainScene extends Scene {
 }
 
 app.addScene('MainScene', new MainScene)
-
-function delay (milliseconds) {
-	return new Promise(resolve => setTimeout(resolve, milliseconds))
-}
