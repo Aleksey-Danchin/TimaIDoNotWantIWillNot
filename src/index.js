@@ -15,20 +15,40 @@ class SoundButton extends Pixi.Sprite {
 
 		this.interactive = true
 		this.buttonMode = true
+		this.byTint = 0xffffff
 
 		this.on('pointerupuoutside', (...args) => this.pointerUpuOutsideHandler(...args))
 		this.on('pointermove', (...args) => this.pointerMoveHandler(...args))
 		this.on('pointerdown', (...args) => this.pointerDownHandler(...args))
 		this.on('pointerup', (...args) => this.pointerUpHandler(...args))
+		this.on('mouseover', (...args) => this.mouseOverHandler(...args))
+		this.on('mouseout', (...args) => this.mouseOutHandler(...args))
 	}
 
 	pointerDownHandler (event) {
 		this.sound.play()
+		Tween.create({
+			targets: [this],
+			duration: 1000,
+			properties: {
+				scale: {
+					x: this.scale.x * -1
+				}
+			}
+		})
 	}
 
 	pointerUpHandler (event) {}
 	pointerUpuOutsideHandler (event) {}
 	pointerMoveHandler (event) {}
+
+	mouseOverHandler (event) {
+		this.tint = this.byTint
+	}
+
+	mouseOutHandler (event) {
+		this.tint = 0xffffff
+	}
 }
 
 const app = new Application({
@@ -53,11 +73,12 @@ class MainScene extends Scene {
 			'assets/mp3/ne_hochy.ogg'
 		)
 
-		button1.x = renderer.width / 2
-		button1.y = renderer.height / 2 - 50
-		button1.anchor.set(0.5)
 		button1.scale.set(0.3)
+		button1.anchor.set(0.5)
+		button1.x = renderer.screen.width / 2
+		button1.y = renderer.screen.height / 2 - 50
 		button1.alpha = 0
+		button1.byTint = 0xff0000
 		container.addChild(button1)
 
 		const button2 = new SoundButton(
@@ -66,11 +87,12 @@ class MainScene extends Scene {
 			'assets/mp3/ny_davai.ogg'
 		)
 
-		button2.x = renderer.width / 2
-		button2.y = renderer.height / 2 - 50
-		button2.anchor.set(0.5)
 		button2.scale.set(0.3)
+		button2.anchor.set(0.5)
+		button2.x = renderer.screen.width / 2
+		button2.y = renderer.screen.height / 2 - 50
 		button2.alpha = 0
+		button2.byTint = 0x00ff00
 		container.addChild(button2)
 
 		const button3 = new SoundButton(
@@ -79,11 +101,12 @@ class MainScene extends Scene {
 			'assets/mp3/ne_bydy.ogg'
 		)
 
-		button3.x = renderer.width / 2
-		button3.y = renderer.height / 2 - 50
-		button3.anchor.set(0.5)
 		button3.scale.set(0.3)
+		button3.anchor.set(0.5)
+		button3.x = renderer.screen.width / 2
+		button3.y = renderer.screen.height / 2 - 50
 		button3.alpha = 0
+		button3.byTint = 0x0000ff
 		container.addChild(button3)
 
 		button1.sound.play()
