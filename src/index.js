@@ -67,6 +67,8 @@ class MainScene extends Scene {
 	load (loader) {}
 
 	async create (container, loader, renderer) {
+		await delay(1500)
+
 		const button1 = new SoundButton(
 			'assets/images/face1.jpg',
 			'assets/mp3/ne_hochy.mp3',
@@ -146,3 +148,7 @@ class MainScene extends Scene {
 }
 
 app.addScene('MainScene', new MainScene)
+
+function delay (milliseconds) {
+	return new Promise(resolve => setTimeout(resolve, milliseconds))
+}
