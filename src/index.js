@@ -1,20 +1,18 @@
-import Application from './Application'
-import Scene from './Scene'
-import Tween from './Tween'
-import Button from './Button'
-
-import * as Pixi from 'pixi.js'
+import { Application, Button, Tween, Scene, Pixi } from './OwnPixi'
 import { Howl, Howler } from 'howler'
 
 class SoundButton extends Button {
 	constructor (texture, audioMP3, audioOGG) {
 		super(texture)
 
-		this.sound = new Howl({
-			src: [audioMP3, audioOGG]
-		})
+		this.sound = new Howl({ src: [audioMP3, audioOGG] })
 
 		this.byTint = 0xffffff
+		this.scale.set(0.3)
+		this.anchor.set(0.5)
+		this.x = app._renderer.screen.width / 2
+		this.y = app._renderer.screen.height / 2 - 50
+		this.alpha = 0
 	}
 
 	pointerDown (event) {
@@ -43,7 +41,9 @@ class SoundButton extends Button {
 const app = new Application({
 	view: document.querySelector('canvas'),
 	width: window.innerWidth,
-	height: window.innerHeight
+	height: window.innerHeight,
+	resolution:window.devicePixelRatio,
+	autoDensity: true,
 })
 
 class MainScene extends Scene {
@@ -53,7 +53,7 @@ class MainScene extends Scene {
 		this.buttons = []
 	}
 
-	load (loader) {
+	async load (loader) {
 		loader.add('face1', 'assets/images/face1.jpg')
 		loader.add('face2', 'assets/images/face2.jpg')
 		loader.add('face3', 'assets/images/face3.jpg')
@@ -66,13 +66,6 @@ class MainScene extends Scene {
 			'assets/mp3/ne_hochy.ogg'
 		)
 
-		button1.scale.set(0.3)
-		button1.anchor.set(0.5)
-		button1.x = renderer.screen.width / 2
-		button1.y = renderer.screen.height / 2 - 50
-		button1.alpha = 0
-		button1.byTint = 0xff0000
-		container.addChild(button1)
 
 		const button2 = new SoundButton(
 			loader.resources.face2.texture,
@@ -80,13 +73,6 @@ class MainScene extends Scene {
 			'assets/mp3/ny_davai.ogg'
 		)
 
-		button2.scale.set(0.3)
-		button2.anchor.set(0.5)
-		button2.x = renderer.screen.width / 2
-		button2.y = renderer.screen.height / 2 - 50
-		button2.alpha = 0
-		button2.byTint = 0x00ff00
-		container.addChild(button2)
 
 		const button3 = new SoundButton(
 			loader.resources.face3.texture,
@@ -94,16 +80,19 @@ class MainScene extends Scene {
 			'assets/mp3/ne_bydy.ogg'
 		)
 
-		button3.scale.set(0.3)
-		button3.anchor.set(0.5)
-		button3.x = renderer.screen.width / 2
-		button3.y = renderer.screen.height / 2 - 50
-		button3.alpha = 0
+		button1.byTint = 0xff0000
+		button2.byTint = 0x00ff00
 		button3.byTint = 0x0000ff
+
+		const buttons = this.buttons = [button1, button2, button3]
+
+		await soundLoading()
+
+		container.addChild(button1)
+		container.addChild(button2)
 		container.addChild(button3)
 
 		button1.sound.play()
-		console.log(button1.x,  button1.width)
 		await Tween.create({
 			targets: [button1],
 			duration: 1000,
@@ -113,7 +102,6 @@ class MainScene extends Scene {
 				alpha: 1
 			}
 		})
-		console.log(button1.x)
 
 		button3.sound.play()
 		await Tween.create({
@@ -135,6 +123,19 @@ class MainScene extends Scene {
 				alpha: 1
 			}
 		})
+
+		function soundLoading () {
+			return new Promise(resolve => {
+				const interval = setInterval(() => {
+					const isLoaded = buttons.every(button => button.sound.state() === 'loaded')
+
+					if (isLoaded) {
+						resolve()
+						clearInterval(interval)
+					}
+				})
+			})
+		}
 	}
 
 	update (delta, duration) {}

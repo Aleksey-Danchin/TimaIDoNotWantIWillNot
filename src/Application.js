@@ -22,7 +22,7 @@ class Application {
 			this._scenesMap.set(name, scene)
 			this._scenesSet.add(scene)
 
-			scene.load(this._loader)
+			await scene.load(this._loader)
 
 			this._loader.load(async () => {
 				this._ticker.add(() => {
